@@ -112,6 +112,14 @@ services:
     volumes:
       - zammad-data:/opt/zammad
 
+  discord-webhooks:
+    build: https://github.com/bloodcloak/zammad-discord-webhook.git#main
+    environment:
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - REPORTS_WEBHOOK=${REPORTS_WEBHOOK}
+      - CONTACTS_WEBHOOK=${CONTACTS_WEBHOOK}
+    restart: ${RESTART}
+
 volumes:
   elasticsearch-data:
     driver: local
