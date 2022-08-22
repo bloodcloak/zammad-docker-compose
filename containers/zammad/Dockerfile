@@ -5,9 +5,9 @@ FROM ruby:3.0.4-slim AS builder
 ARG BUILD_DATE
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV GIT_BRANCH stable
+ENV GIT_BRANCH discord-5-21
 ENV GIT_URL ${PROJECT_URL}.git
-ENV PROJECT_URL https://github.com/zammad/zammad
+ENV PROJECT_URL https://github.com/bloodcloak/zammad
 ENV RAILS_ENV production
 ENV RAILS_LOG_TO_STDOUT true
 ENV TAR_GZ_URL ${PROJECT_URL}/archive/${GIT_BRANCH}.tar.gz
@@ -20,9 +20,8 @@ SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
 # install zammad
 COPY containers/zammad/setup.sh /tmp
-RUN chmod +x /tmp/setup.sh; \
-    /tmp/setup.sh builder
-
+RUN chmod +x /tmp/setup.sh
+RUN /tmp/setup.sh builder
 
 FROM ruby:3.0.4-slim
 
@@ -40,7 +39,7 @@ LABEL org.label-schema.build-date="$BUILD_DATE" \
       org.label-schema.schema-version="5.2.1" \
       org.label-schema.docker.cmd="sysctl -w vm.max_map_count=262144;docker-compose up"
 
-ENV GIT_BRANCH stable
+ENV GIT_BRANCH discord-5-21
 ENV RAILS_ENV production
 ENV RAILS_LOG_TO_STDOUT true
 ENV ZAMMAD_DIR /opt/zammad
@@ -49,8 +48,8 @@ ENV ZAMMAD_TMP_DIR /tmp/zammad-${GIT_BRANCH}
 ENV ZAMMAD_USER zammad
 
 COPY containers/zammad/setup.sh /tmp
-RUN chmod +x /tmp/setup.sh; \
-    /tmp/setup.sh runner
+RUN chmod +x /tmp/setup.sh
+RUN /tmp/setup.sh runner
 
 COPY --from=builder ${ZAMMAD_TMP_DIR} ${ZAMMAD_TMP_DIR}
 COPY --from=builder /usr/local/bundle /usr/local/bundle
