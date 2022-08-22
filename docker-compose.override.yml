@@ -1,8 +1,107 @@
----
 version: '3'
-
 services:
+  # region: Log Drivers
+  zammad-backup:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  zammad-elasticsearch:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  zammad-init:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  zammad-memcached:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  zammad-postgresql:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  zammad-railsserver:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  zammad-redis:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  zammad-scheduler:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  zammad-websocket:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+  # endregion
 
   zammad-nginx:
     ports:
-      - "8080:8080"
+      - "127.0.0.1:57897:8080/tcp"
+    environment:
+      - NGINX_SERVER_SCHEME=https
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  discord-webhooks:
+    build: https://github.com/bloodcloak/zammad-discord-webhook.git#main
+    entrypoint: python3
+    command: webhook_forwarder.py
+    depends_on:
+      - zammad-railsserver
+    environment:
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - REPORTS_WEBHOOK=${REPORTS_WEBHOOK}
+      - CONTACTS_WEBHOOK=${CONTACTS_WEBHOOK}
+    restart: ${RESTART}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  hooks:
+    image: ghcr.io/lolpants/capn-hook:c58a9f6
+    restart: always
+    depends_on:
+      - zammad-railsserver
+    volumes:
+      - ./data/hooks.json:/app/config/config.json:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
